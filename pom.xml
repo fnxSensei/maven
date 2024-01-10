@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--  комментарии  -->
+    <!-- 1. GAV - обязательная информация -->
+    <groupId>org.example</groupId>
+    <artifactId>maven-progect</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <!-- SNAPSHOT - версия находится в разработке -->
+
+    <!-- 2. Необязательная информация -->
+    <name>Maven Project</name>
+    <description>Maven Project Lesson</description>
+
+    <!-- jar по умолчанию -->
+    <packaging>jar</packaging>
+    <!-- pom - родитель в модульной сборке -->
+    <!-- war - для web приложений -->
+    <!-- ear - для enterprise приложений -->
+
+    <!-- репозиторий - хранилище артефактов -->
+    <!-- центральный -->
+    <!-- корпоративный -->
+    <!-- локальный .m2/repository -->
+
+    <!-- зависимости проекта -->
+    <dependencies> <!-- все зависимости -->
+        <dependency> <!-- отдельная зависимость -->
+            <groupId>org.junit.jupiter</groupId> <!-- указывать обязательно -->
+            <artifactId>junit-jupiter-engine</artifactId> <!-- указывать обязательно -->
+            <version>5.10.1</version> <!-- если не указана, будет загружаться последняя
+             если указана со SNAPSHOT, то всегда будет загружаться из удаленного репозитория-->
+            <scope>test</scope> <!-- Ctrl + Shift + /  часть строки -->
+            <!-- Ctrl + /  всю строку -->
+            <!--            Область видимости зависимостей: <scope></scope>-->
+            <!--            <scope>compile</scope> - используется по умолчанию.
+                            Зависимость доступна во время выполнения, тестирования, сборки
+                            <scope>test</scope> - доступна только при тестировании
+                            <scope>runtime</scope> - используется по время выполнения / тестирования
+                             Не будет доступна на этапе сборки.
+                             Нет прямого доступа к классам библиотеки-->
+            <!--            <scope>import</scope> для модульной сборки-->
+            <!--            <scope>provided</scope> аналогично compile, но не попадет в сборку-->
+            <!--            <scope>system</scope> <systemPath>путь к библиотеке</systemPath>-->
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.8.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.8.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.1</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.4.1.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.5</version>
+        </dependency>
+
+
+    </dependencies>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!--  <build>
+          <finalName>jar-name</finalName>
+          <plugins>
+              <plugin>
+                  <groupId></groupId>
+                  <artifactId></artifactId>
+                  <version></version>
+                  <executions>
+                      <execution>
+                          <phase>фаза сборки</phase>
+                          <goals>
+                              <goal>задача плагина</goal>
+                          </goals>
+                      </execution>
+                  </executions>
+              </plugin>
+          </plugins>
+      </build> -->
+
+    <build>
+        <finalName>jar-name</finalName>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--  для того, чтобы jar был исполняемым -->
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>com.lessons.maven.MavenLesson</mainClass>
+                        </transformer>
+                    </transformers>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <!--   дополнительные настройки плагина-->
+                <configuration>
+                    <show>private</show>
+                </configuration>
+                <!-- Привязка к фазам сборки-->
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <!--   задача, которую должен выполнить плагин на указанных фазах сборки-->
+                            <goal>aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.9.1</version>
+                <configuration>
+                    <locales>en,ru,fr</locales>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!--            <dependencies>зависимости профиля</dependencies>-->
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/development</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/production</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
